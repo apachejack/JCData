@@ -65,15 +65,28 @@ class JCData{
 	}
 	
 
-	public function get($path){
-		return $this->exploreData($this->data, $path, "get");
+	public function get($path, $expected_not_null = false){
+		return $this->exploreData($this->data, $path, "get", ["force_strict_access" => $expected_not_null]);
 	}
 
 	public function set($path, $value, $return_value = false){
 		if(is_null($value) && $this->strictAccess())
 			throw new \InvalidArgumentException("value can't be null when strict_access is enabled. Use clear method instead", 1);
+
+		$params = ["value" => $value];
 			
-		$saved_value = $this->exploreData($this->data, $path, "set", $value, $return_value);
+		$saved_value = $this->exploreData($this->data, $path, "set", $params);
+
+		return $return_value ? $saved_value : $this;
+	}
+
+	public function push($path, $index, $value, $return_value = false){
+		if(is_null($value) && $this->strictAccess())
+			throw new \InvalidArgumentException("value can't be null when strict_access is enabled. Use clear method instead", 1);
+			
+		$params = ["index" => $index, "value" => $value];
+
+		$saved_value = $this->exploreData($this->data, $path, "push", $params);
 
 		return $return_value ? $saved_value : $this;
 	}
@@ -88,7 +101,7 @@ class JCData{
 		return $this->data;
 	}
 
-	protected function exploreData(&$data, $path, $method = "get", $set_value = NULL){
+	protected function exploreData(&$data, $path, $method = "get", $params = []){
 		if(is_int($path)) $path = (string)$path;
 
 		if(is_string($path) && strpos($path, "/") !== false){
@@ -134,15 +147,28 @@ class JCData{
 
 		$defined = is_array($level_data) && array_key_exists($searched, $level_data);
 
-		if($this->strictAccess() && !$defined){
+		$strict_access = isset($params["force_strict_access"]) ? $params["force_strict_access"] : $this->strictAccess();
+
+		if($strict_access && !$defined){
 			throw new StrictAccessException("Key `{$searched}` doesn't exist at saved data. Used path: ".print_r($path, true)." .... Tip! Deactivate the strict_mode if you require free access and writting");
 		}
 
 		if($method == "get"){
 			return $defined ? $level_data[$searched] : NULL;
 		}
-		else{
-			return $level_data[$searched] = $set_value;
+		elseif($method == "set"){
+			return $level_data[$searched] = $params["value"];
+		}
+		elseif($method == "push"){
+			
+			if(!is_array($level_data[$searched])){
+				throw new \InvalidArgumentException("Key `{$searched}` isn't a array, you can't push here your data", 1);
+			}
+
+			if($params["index"] !== NULL && $params["index"] !== "")
+				return $level_data[$searched][$params["index"]] = $params["value"];
+			else
+				return $level_data[$searched][] = $params["value"];	
 		}
 	}
 

@@ -26,8 +26,15 @@ $data = [
 ];
 
 $JCData = new JCData($data);
-$JCData->strictAccess(false);
-echo $variable = $JCData->get("level1/level2/hola");
+$JCData->strictAccess(true);
+
+//$JCData->push("level1/level2", "adios", "adios");
+$JCData->push("level1/level2", "adios", "adios");
+
+echo var_dump($JCData->get("level1/level2", true));
+echo "<br>";
+
+echo $variable = $JCData->get("level1/level2/adios");
 echo "<br>";
 //$JCData->set("level1/level2", "grrrr");
 //$JCData->set("pedo", "hola");
