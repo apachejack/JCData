@@ -7,6 +7,8 @@
             "email": "heypixelweb@gmail.com"
         }
     ],
+    "version": "1.0.0",
+    "homepage": "http://heypixel.es",
     "minimum-stability": "dev",
     "license": "MIT",
     "require": {
