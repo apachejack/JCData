@@ -69,12 +69,13 @@ class JCData{
 		return $this->exploreData($this->data, $path, "get");
 	}
 
-	public function set($path, $value){
+	public function set($path, $value, $return_value = false){
 		if(is_null($value) && $this->strictAccess())
 			throw new \InvalidArgumentException("value can't be null when strict_access is enabled. Use clear method instead", 1);
 			
-		$this->exploreData($this->data, $path, "set", $value);
-		return $this;
+		$saved_value = $this->exploreData($this->data, $path, "set", $value, $return_value);
+
+		return $return_value ? $saved_value : $this;
 	}
 
 	//It sets to NULL the value
