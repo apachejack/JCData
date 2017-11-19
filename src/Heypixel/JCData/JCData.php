@@ -22,9 +22,10 @@ use Heypixel\JCData\Exceptions\StrictAccessException;
 	Available methods: 
 		$JCData->get($path);
 		$JCData->set($path, $value);
+		$JCData->push($path, $index, $value);
 		$JCData->clear($path); 
 
-	$path valid arguments:
+	$path valid arguments at get method:
 	1. "level1/level2/hola" will return "muahahaha"
 	2. ["level1", "level2", "hola"] will return "muahahaha"
 	3. "hola" will it return "jejeje"
@@ -38,9 +39,11 @@ use Heypixel\JCData\Exceptions\StrictAccessException;
 		]
 
 	
-	If get method can't resolve the path, it will return NULL if the strict_mode is disabled, otherwise it will throw a StrictAccessException
 
-	If set or clear method can't resolve the path, it will be added to the data it if the strict_mode is disabled, otherwise it will throw a StrictAccessException
+	By default, if the get method can't resolve the path, it will return NULL. You can force the strict mode to throw a StrictAccessException setting the second parameter to true: 
+	get("level1/level2", true);
+
+	If set, push or clear method can't resolve the path it will throw a StrictAccessException if it's activated. 
 */
 class JCData{
 	protected $initial_default_data_structure = null;
@@ -160,7 +163,7 @@ class JCData{
 			return $level_data[$searched] = $params["value"];
 		}
 		elseif($method == "push"){
-			
+
 			if(!is_array($level_data[$searched])){
 				throw new \InvalidArgumentException("Key `{$searched}` isn't a array, you can't push here your data", 1);
 			}
