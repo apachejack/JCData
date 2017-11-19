@@ -1,0 +1,8 @@
+{
+    "name": "heypixel/jcdata",
+    "autoload": {
+        "psr-0" : {
+            "Heypixel\\JCData" : "src"
+        }
+    }
+}
